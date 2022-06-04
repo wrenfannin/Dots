@@ -1,4 +1,5 @@
 # Dotfiles
-Configuration files for my Arch Linux i3wm setup with polybar 
+Configs for Xmonad and Polybar
 
-![Screenshot_2022-04-18-09-28-11_2944x1280](https://user-images.githubusercontent.com/64269332/163780575-1ddc24ab-212a-4376-9a23-0b06f6b2076b.png)
+![image](https://user-images.githubusercontent.com/64269332/172004385-48f7b0db-9592-47a9-945e-1d4f594cc6b5.png)
+
