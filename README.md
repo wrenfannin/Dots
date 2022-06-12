@@ -5,7 +5,8 @@ Configs for:
 - i3
 - Picom
 - Polybar
-- With Wallpapers
+- Wallpapers
+- Vim
 
 ![image](https://user-images.githubusercontent.com/64269332/172006314-661c330f-91d4-466c-ab56-5f7407e52bbe.png)
 
