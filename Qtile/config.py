@@ -1,308 +1,308 @@
+# Copyright (c) 2010 Aldo Cortesi
+# Copyright (c) 2010, 2014 dequis
+# Copyright (c) 2012 Randall Ma
+# Copyright (c) 2012-2014 Tycho Andersen
+# Copyright (c) 2012 Craig Barnes
+# Copyright (c) 2013 horsik
+# Copyright (c) 2013 Tao Sauvage
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+# todo, figure out a way to move and float windows, and put them back to tile
+# could do this through just makeing it so that I can disable floating through a shortcut
+# also floating mode border
+
+# also change the margin of the bar and the windows
+# basically I want the border to have 4 bottom margin
+# and the windows no margin to make max have proper margins
+
 import os
 import subprocess
-from libqtile import bar, layout, widget, hook, qtile
+# import iwlib
+from libqtile import bar, layout, widget, hook
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 
 mod = "mod4"
-terminal = guess_terminal()
+terminal = "alacritty"
+
+
+@hook.subscribe.startup_once
+def autostart():
+    home = os.path.expanduser("~/.config/qtile/autostart.sh")
+    subprocess.run([home])
+
 
 keys = [
+    # A list of available commands that can be bound to keys can be found
+    # at https://docs.qtile.org/en/latest/manual/config/lazy.html
+    # Custom
+   # Key([], 'XF96MonBrightnessUp', lazy.spawn('brightnessctl set +10%'))
+   # Key([], 'XF96MonBrightnessUp', lazy.spawn('brightnessctl set -10%'))
+    Key([mod], "f", lazy.window.toggle_floating(), desc="Toggle Floating"),
+    Key([mod], "p", lazy.spawn("rofi -show drun"), desc="Launch program launcher"),
+    Key([mod], "r", lazy.spawn("rofi -show run"), desc="Launch run launcher"),
+    # Custom Media
+    Key([], "Print", lazy.spawn("flameshot gui"), desc="Take a screenshot"),
     Key(
-        [mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"
+        [],
+        "XF86AudioLowerVolume",
+        lazy.spawn("amixer sset Master 5%-"),
+        desc="Lower volume",
     ),
+    Key(
+        [],
+        "XF86AudioRaiseVolume",
+        lazy.spawn("amixer sset Master 5%+"),
+        desc="Raise volume",
+    ),
+    Key(
+        [],
+        "XF86AudioMute",
+        lazy.spawn("amixer -D default set Master toggle"),
+        desc="Mute volume",
+    ),
+    
+    # Switch between windows
+    Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
+    Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
+    Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
+    Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
+    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+    # Move windows between left/right columns or move up/down in current stack.
+    # Moving out of range in Columns layout will create new column.
+    Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    Key([mod, "shift"], "n", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    Key([mod, "shift"], "e", lazy.layout.shuffle_down(), desc="Move window down"),
+    Key([mod, "shift"], "i", lazy.layout.shuffle_up(), desc="Move window up"),
+    # Grow windows. If current window is on the edge of screen and direction
+    # will be to screen edge - window would shrink.
+    Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
+    Key([mod, "control"], "n", lazy.layout.grow_right(), desc="Grow window to the right"),
+    Key([mod, "control"], "e", lazy.layout.grow_down(), desc="Grow window down"),
+    Key([mod, "control"], "i", lazy.layout.grow_up(), desc="Grow window up"),
+    Key([mod], "k", lazy.layout.normalize(), desc="Reset all window sizes"),
+    # Toggle between split and unsplit sides of stack.
+    # Split = all windows displayed
+    # Unsplit = 1 window displayed, like Max layout, but still with
+    # multiple stack panes
     Key(
         [mod, "shift"],
-        "l",
-        lazy.layout.shuffle_right(),
-        desc="Move window to the right",
+        "Return",
+        lazy.layout.toggle_split(),
+        desc="Toggle between split and unsplit sides of stack",
     ),
-    Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
-    Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
-    Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
-    Key(
-        [mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"
-    ),
-    Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
-    Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
-    Key([mod, "shift"], "Return", lazy.spawn("thunar"), desc="Spawn File Manager"),
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
-    Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
+    # Toggle between different layouts as defined below
+    Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
+    Key([mod], "w", lazy.window.kill(), desc="Kill focused window"),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([mod], "d", lazy.spawn("rofi -show drun"), desc="Spawn rofi drun"),
-    Key([mod], "b", lazy.spawn("firefox"), desc="Spawn browser"),
+    Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+    # Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
 ]
 
-groups = []
+#groups = [Group(i) for i in ["★", "★", "3★", "4★", "5★"]]
+groups = [Group(i) for i in ["1", "2", "3", "4", "5"]]
+#groups = [Group(i) for i in "12345"]
+group_hotkeys = "12345"
 
-group_names = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "0",
-]
-
-group_labels = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-]
-
-group_layouts = [
-    "bsp",
-    "bsp",
-    "bsp",
-    "bsp",
-    "bsp",
-    "bsp",
-    "bsp",
-    "bsp",
-    "bsp",
-    "bsp",
-]
-
-for i in range(len(group_names)):
-    groups.append(
-        Group(
-            name=group_names[i],
-            layout=group_layouts[i].lower(),
-            label=group_labels[i],
-        )
-    )
-
-for i in groups:
+for i, k in zip(groups, group_hotkeys):
     keys.extend(
         [
-            Key([mod], i.name, lazy.group[i.name].toscreen()),
-            Key([mod], "Tab", lazy.screen.next_group()),
-            Key([mod, "shift"], "Tab", lazy.screen.prev_group()),
-            Key(["mod1"], "Tab", lazy.screen.next_group()),
-            Key(["mod1", "shift"], "Tab", lazy.screen.prev_group()),
+            # mod1 + letter of group = switch to group
+            Key(
+                [mod],
+                k,
+                lazy.group[i.name].toscreen(),
+                desc="Switch to group {}".format(i.name),
+            ),
+            # mod1 + shift + letter of group = switch to & move focused window to group
             Key(
                 [mod, "shift"],
-                i.name,
-                lazy.window.togroup(i.name),
-                lazy.group[i.name].toscreen(),
+                k,
+                lazy.window.togroup(i.name, switch_group=True),
+                desc="Switch to & move focused window to group {}".format(i.name),
             ),
+            # Or, use below if you prefer not to switch to that group.
+            # # mod1 + shift + letter of group = move focused window to group
+            # Key([mod, "shift"], i.name, lazy.window.togroup(i.name),
+            #     desc="move focused window to group {}".format(i.name)),
         ]
     )
 
-
-layout_options = {"margin": 5, "border_width": 0}
-
-
-def init_colors():
-    return [
-        ["#2e3440", "#2e3440"],  # color 0
-        ["#373e4d", "#373e4d"],  # color 1
-        ["#434c5e", "#434c5e"],  # color 2
-        ["#4c566a", "#4c566a"],  # color 3
-        ["#d8dee9", "#d8dee9"],  # color 4
-        ["#e5e9f0", "#e5e9f0"],  # color 5
-        ["#eceff4", "#eceff4"],  # color 6
-        ["#88c0d0", "#88c0d0"],  # color 7
-        ["#81a1c1", "#81a1c1"],  # color 8
-        ["#5e81ac", "#5e81ac"],  # color 9
-    ]
-
-
-colors = init_colors()
-
-layouts = [layout.Bsp(fair=False, **layout_options)]
+layouts = [
+    layout.Columns(
+        # border_on_single=True,
+        border_focus="#575268",
+        border_normal="#161320",
+        border_width=2,
+        margin=[0, 4, 4, 4],
+        ),
+    layout.Max(),
+    # layout.Floating(
+    #     border_focus="#575268",
+    #     border_normal="#161320",
+    #     border_width=4,
+    #     ),
+    # layout.Bsp(),
+    # Try more layouts by unleashing below layouts.
+   # layout.Stack(num_stacks=2),
+    #layout.Matrix(),
+    # layout.MonadTall(),
+    # layout.MonadWide(),
+    # layout.RatioTile(),
+   # layout.Tile(),
+    #layout.TreeTab(),
+    # layout.VerticalTile(),
+    #layout.Zoomy(),
+]
 
 widget_defaults = dict(
-    font="Source Code Pro", fontsize=12, padding=3, background=colors[1]
+    font="JetBrainsMono Nerd Font Bold",
+    fontsize=12,
+    padding=5,
 )
 extension_defaults = widget_defaults.copy()
-
-
-def open_calcurse():
-    qtile.cmd_spawn("alacritty -e calcurse")
-
-
-def open_btm():
-    qtile.cmd_spawn("alacritty -e btm")
-
-
-def open_yay():
-    qtile.cmd_spawn("alacritty -e yay -Syu")
-
 
 screens = [
     Screen(
         top=bar.Bar(
             [
                 widget.GroupBox(
-                    font="Font Awesome 6 Free",
-                    fontsize=16,
-                    margin_y=3,
-                    margin_x=5,
-                    padding_y=0,
-                    padding_x=0,
-                    borderwidth=0,
-                    disable_drag=True,
-                    active=colors[9],
-                    inactive=colors[5],
+                    fontsize=18,
+                    active="#96CDFB",
+                    inactive="#6E6C7E",
+                    foreground="#96CDFB",
                     rounded=False,
-                    highlight_method="text",
-                    this_current_screen_border=colors[7],
-                    background=colors[1],
-                ),
+                    borderwidth=2,
+                    margin=4,
+                    highlight_method="line",
+                    highlight_color="#161320",
+                    other_screen_border="#6E6C7E",
+                    other_current_screen_border="#96CDFB",
+                    this_current_screen_border="#96CDFB",
+                    this_screen_border="#6E6C7E",
+                    ),
+                widget.Prompt(
+                    foreground="#d9e0ee",
+                    ),
                 widget.WindowName(
-                    font="Source Code Pro",
-                    fontsize=16,
-                    foreground=colors[5],
-                    background=colors[1],
-                ),
-                widget.Image(filename="/home/jackb/.config/qtile/power_9.png"),
-                widget.TextBox(
-                    font="Font Awesome 6 Free",
-                    text=" ",
-                    foreground=colors[5],
-                    fontsize=16,
-                    mouse_callbacks={"Button1": open_yay},
-                    background=colors[9],
-                ),
-                widget.CheckUpdates(
-                    display_format="{updates}",
-                    update_interval=120,
-                    distro="Arch_checkupdates",
-                    no_update_string="No updates",
-                    font="Source Code Pro",
-                    fontsize=16,
-                    mouse_callbacks={"Button1": open_yay},
-                    background=colors[9],
-                ),
-                widget.Image(
-                    filename="/home/jackb/.config/qtile/power_3.png",
-                    background=colors[9],
-                ),
-                widget.TextBox(
-                    font="Font Awesome 6 Free",
-                    text=" ",
-                    foreground=colors[5],
-                    fontsize=16,
-                    mouse_callbacks={"Button1": open_btm},
-                    background=colors[3],
-                ),
-                widget.CPU(
-                    font="Source Code Pro",
-                    format="{load_percent}%",
-                    fontsize=16,
-                    foreground=colors[5],
-                    mouse_callbacks={"Button1": open_btm},
-                    background=colors[3],
-                ),
-                widget.Image(
-                    filename="/home/jackb/.config/qtile/power_9.png",
-                    background=colors[3],
-                ),
-                widget.TextBox(
-                    font="Font Awesome 6 Free",
-                    text=" ",
-                    foreground=colors[5],
-                    background=colors[9],
-                    padding=0,
-                    fontsize=16,
-                    mouse_callbacks={"Button1": open_btm},
-                ),
-                widget.Memory(
-                    font="Source Code Pro",
-                    format="{MemUsed: .0f}{mm}",
-                    update_interval=1,
-                    fontsize=16,
-                    foreground=colors[5],
-                    background=colors[9],
-                    mouse_callbacks={"Button1": open_btm},
-                ),
-                widget.Image(
-                    filename="/home/jackb/.config/qtile/power_3.png",
-                    background=colors[9],
-                ),
-                widget.Systray(
-                    background=colors[3],
-                    foreground=colors[5],
-                    icon_size=20,
-                    padding=0,
-                    margin=5,
-                ),
-                widget.Image(
-                    filename="/home/jackb/.config/qtile/power_9.png",
-                    background=colors[3],
-                ),
-                widget.TextBox(
-                    font="Font Awesome 6 Free",
-                    text=" ",
-                    foreground=colors[5],
-                    background=colors[9],
-                    padding=0,
-                    fontsize=16,
-                    mouse_callbacks={"Button1": open_calcurse},
-                ),
+                    foreground="#d9e0ee",
+                    font="jetbrainsmono nerd font medium",
+                    ),
+                widget.Chord(
+                    foreground="#d9e0ee",
+                    chords_colors={
+                        "launch": ("#ff0000", "#ffffff"),
+                    },
+                    name_transform=lambda name: name.upper(),
+                    ),
+                widget.Systray(icon_size=15),
+                widget.Volume(
+                    foreground="#96cdfb",
+                    fmt="墳 {}"
+                    ),
+                widget.Sep(
+                    foreground="#96CDFB",
+                    line_width=2,
+                    size_percent=50,
+                    ),
+                widget.Backlight(
+                    foreground="#d9e0ee",
+                    backlight_name="intel_backlight",
+                    fmt="☀ {}"
+                    ),
+                widget.Sep(
+                    foreground="#96CDFB",
+                    line_width=2,
+                    size_percent=50,
+                    ),
+                # widget.Wlan(),
+                widget.Battery(
+                    foreground="#96CDFB",
+                    low_foreground="#F28FAD",
+                    low_percentage=.3,
+                    format="{char} {percent:2.0%}",
+                    charge_char="",
+                    discharge_char="",
+                    full_char="",
+                    unknown_char="",
+                    empty_char="",
+                    ),
+                widget.Sep(
+                    foreground="#96CDFB",
+                    line_width=2,
+                    size_percent=50,
+                    ),
                 widget.Clock(
-                    font="Source Code Pro",
-                    foreground=colors[5],
-                    background=colors[9],
-                    fontsize=16,
-                    format="%d-%m-%Y %H:%M",
-                    mouse_callbacks={"Button1": open_calcurse},
+                    foreground="#d9e0ee",
+                    format=" %a %I:%M %p"
+                    ),
+                widget.Sep(
+                    foreground="#96CDFB",
+                    line_width=2,
+                    size_percent=50,
+                    ),
+                widget.CurrentLayout(
+                    foreground="#96CDFB",
+                    ),
+                widget.Sep(
+                    foreground="#96CDFB",
+                    line_width=2,
+                    size_percent=50,
+                    ),
+                widget.TextBox(
+                    text="⏻",
+                    mouse_callbacks={"Button1": lazy.spawn("systemctl poweroff"),}
                 ),
                 widget.TextBox(
-                    font="Font Awesome 6 Free",
-                    text="  ",
-                    foreground=colors[5],
-                    background="#bf616a",
-                    padding=0,
-                    fontsize=16,
-                    mouse_callbacks={"Button1": lazy.spawn("reboot")},
+                    text="⟳",
+                    fontsize=18,
+                    mouse_callbacks={"Button1": lazy.spawn("systemctl restart"),}
                 ),
                 widget.TextBox(
-                    font="Font Awesome 6 Free",
-                    text=" ",
-                    foreground=colors[5],
-                    background="#bf616a",
-                    padding=0,
-                    fontsize=16,
-                    mouse_callbacks={"Button1": lazy.spawn("shutdown now")},
+                    text="⏾",
+                    mouse_callbacks={"Button1": lazy.spawn("systemctl suspend"),}
+                ),
+                widget.Sep(
+                    foreground="#161320", # a shitty margin because I'm lazy
+                    linewidth=1,
                 ),
             ],
-            24,
-            margin=[10, 10, 5, 10],
+            20,
+            background="#161320",
+            opacity=.95,
+            margin=[4, 4, 4, 4]
+            # border_width=[0, 0, 2, 0],  # Draw top and bottom borders
+            # border_color=["000000", "000000", "96CDFB", "000000"]  # Borders are magenta
         ),
-        bottom=bar.Gap(5),
-        left=bar.Gap(5),
-        right=bar.Gap(5),
     ),
 ]
 
+# Drag floating layouts.
 mouse = [
-    Drag(
-        [mod],
-        "Button1",
-        lazy.window.set_position_floating(),
-        start=lazy.window.get_position(),
-    ),
-    Drag(
-        [mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()
-    ),
+    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
     Click([mod], "Button2", lazy.window.bring_to_front()),
 ]
-
 
 dgroups_key_binder = None
 dgroups_app_rules = []  # type: list
@@ -310,7 +310,11 @@ follow_mouse_focus = True
 bring_front_click = False
 cursor_warp = False
 floating_layout = layout.Floating(
+    border_focus = "#96CDFB",
+    border_normal = "#161320",
+    border_width = 2,
     float_rules=[
+        # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
         Match(wm_class="confirmreset"),  # gitk
         Match(wm_class="makebranch"),  # gitk
@@ -331,11 +335,12 @@ auto_minimize = True
 # When using the Wayland backend, this can be used to configure input devices.
 wl_input_rules = None
 
-
-@hook.subscribe.startup_once
-def start_once():
-    home = os.path.expanduser("~")
-    subprocess.call([home + "/.config/qtile/autostart.sh"])
-
-
-wmname = "Qtile"
+# XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
+# string besides java UI toolkits; you can see several discussions on the
+# mailing lists, GitHub issues, and other WM documentation that suggest setting
+# this string if your java app doesn't work correctly. We may as well just lie
+# and say that we're a working one by default.
+#
+# We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
+# java that happens to be on java's whitelist.
+wmname = "LG3D"
