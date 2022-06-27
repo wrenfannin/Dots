@@ -6,7 +6,7 @@
 ██████╔╝╚█████╔╝░░░██║░░░██║░░░░░██║███████╗███████╗██████╔╝
 ╚═════╝░░╚════╝░░░░╚═╝░░░╚═╝░░░░░╚═╝╚══════╝╚══════╝╚═════╝░
 
-
+#See also: https://github.com/wrenfannin/Suckless/blob/main/README.md #
 Configs for:
 - Qtile
 - Xmonad
