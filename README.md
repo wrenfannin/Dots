@@ -16,7 +16,10 @@ Configs for:
 - Picom
 - Polybar
 - Wallpapers
-- Vim
+- Vim!
+
+[2022-07-08_09-50](https://user-images.githubusercontent.com/64269332/177955515-e5979f62-4b30-4c4c-9ec5-2aa9b0cdbab4.png)
+
 
 ![image](https://user-images.githubusercontent.com/64269332/172006314-661c330f-91d4-466c-ab56-5f7407e52bbe.png)
 
