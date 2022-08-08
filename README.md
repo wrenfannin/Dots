@@ -7,7 +7,7 @@
 ╚═════╝░░╚════╝░░░░╚═╝░░░╚═╝░░░░░╚═╝╚══════╝╚══════╝╚═════╝░
 
 #
-See also: https://github.com/wrenfannin/Suckless/blob/main/README.md
+See also: https://github.com/wrenfannin/Suckless/blob/main/README.md for DWM configurations
 
 Configs for:
 - Qtile
