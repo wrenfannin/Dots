@@ -9,7 +9,7 @@
 Not currently maintained
 
 #
-### See also: https://github.com/wrenfannin/Suckless/blob/main/README.md for DWM configurations
+### See also: https://github.com/wrenfannin/Suckless/blob/main/README.md for DWM configurations (Daily Driver)
 
 Configs for:
 - Qtile
